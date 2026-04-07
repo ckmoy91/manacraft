@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Realm & Survival | ManaCRAFT</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Cinzel:wght@400;700&family=IM+Fell+English:ital@0;1&display=swap');
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{font-size:16px;}
+body{
+    font-family:'IM Fell English',Georgia,serif;
+    background:#0a1510;color:#e8dfc0;min-height:100vh;
+    background-image:
+        url("data:image/svg+xml,%3Csvg width='4' height='4' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='0' y='0' width='2' height='2' fill='rgba(168,224,99,0.025)'/%3E%3Crect x='2' y='2' width='2' height='2' fill='rgba(168,224,99,0.025)'/%3E%3C/svg%3E"),
+        radial-gradient(ellipse at 50% 0%,rgba(100,180,80,.09) 0%,transparent 55%),
+        linear-gradient(180deg,#08120e 0%,#0a1510 40%,#0c1812 100%);
+}
+.mana-tree{position:fixed;top:50%;left:50%;transform:translate(-50%,-52%);width:min(460px,82vw);height:auto;opacity:.24;pointer-events:none;z-index:0;image-rendering:pixelated;filter:drop-shadow(0 0 24px rgba(168,224,99,.16));animation:treePulse 6s ease-in-out infinite;}
+@keyframes treePulse{0%,100%{opacity:.22;}50%{opacity:.32;filter:drop-shadow(0 0 40px rgba(168,224,99,.28));}}
+.topbar,nav,.main,footer{position:relative;z-index:1;}
+.topbar{background:rgba(6,14,10,.96);border-bottom:4px solid #3a6e28;padding:12px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;font-family:'Press Start 2P',monospace;font-size:9px;}
+.server-status{display:flex;align-items:center;gap:10px;white-space:nowrap;}
+.status-dot{width:12px;height:12px;background:#a8e063;display:inline-block;box-shadow:0 0 0 2px #0a1510,0 0 10px #a8e063;animation:pixelPulse 1.8s steps(2) infinite;flex-shrink:0;}
+@keyframes pixelPulse{0%,100%{background:#a8e063;}50%{background:#4a8020;}}
+.connect-info{font-size:8px;color:#c8a84a;display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+.connect-info strong{color:#e8dfc0;}
+.donation-bar-wrap{background:rgba(4,10,8,.97);border-bottom:4px solid #5c3d0a;padding:10px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-family:'Press Start 2P',monospace;font-size:8px;}
+.donation-label{color:#c8a84a;white-space:nowrap;}
+.bar-outer{flex:1;min-width:120px;height:18px;background:#1a2e14;border-top:3px solid #3a5a28;border-left:3px solid #3a5a28;border-bottom:3px solid #1a2e10;border-right:3px solid #1a2e10;position:relative;overflow:hidden;}
+.bar-inner{height:100%;background:repeating-linear-gradient(90deg,#3a7d20 0,#5aae30 8px,#3a7d20 16px);width:0%;transition:width 2s steps(20);}
+.bar-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:7px;color:#fff;text-shadow:1px 1px 0 #000;white-space:nowrap;font-family:'Press Start 2P',monospace;}
+.donation-amount{color:#c8a84a;white-space:nowrap;}
+nav{background:rgba(8,16,12,.97);border-bottom:4px solid #2a4e1e;padding:0 24px;display:flex;flex-direction:column;align-items:center;}
+.nav-top-row{width:100%;display:flex;align-items:center;justify-content:space-between;padding:10px 0 6px;}
+.nav-brand{font-family:'Press Start 2P',monospace;font-size:clamp(12px,2.8vw,18px);color:#a8e063;text-shadow:3px 3px 0 #1a4a10,0 0 20px rgba(168,224,99,.4);letter-spacing:2px;white-space:nowrap;text-decoration:none;}
+.nav-brand span{color:#ffd700;text-shadow:3px 3px 0 #6b4a00,0 0 14px rgba(255,215,0,.5);}
+.nav-links{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;width:100%;padding:0 0 6px;gap:2px;}
+.nav-links a{color:#98b880;text-decoration:none;padding:10px 14px;font-family:'Press Start 2P',monospace;font-size:clamp(7px,1.2vw,10px);transition:all .15s steps(2);border-bottom:4px solid transparent;white-space:nowrap;}
+.nav-links a:hover,.nav-links a.active{color:#a8e063;border-bottom-color:#a8e063;background:rgba(168,224,99,.07);}
+.nav-links a.store{color:#ffd700;}
+.nav-links a.store:hover{color:#ffe88a;border-bottom-color:#ffd700;background:rgba(255,215,0,.06);}
+.nav-links a.discord{color:#7eb8e8;}
+.nav-links a.discord:hover{color:#aad4f8;border-bottom-color:#7eb8e8;background:rgba(126,184,232,.06);}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:9px 8px;background:none;border:3px solid #3a6e28;}
+.hamburger span{display:block;width:22px;height:3px;background:#a8e063;transition:all .2s steps(3);}
+.hamburger.open span:nth-child(1){transform:translateY(8px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-8px) rotate(-45deg);}
+.main{max-width:1100px;margin:0 auto;padding:36px 20px;}
+.mana-card{background:rgba(10,20,14,.88);border-top:4px solid #3a6228;border-left:4px solid #3a6228;border-bottom:4px solid #142010;border-right:4px solid #142010;padding:28px 26px;margin-bottom:26px;box-shadow:4px 4px 0 #060e08;position:relative;}
+.mana-card::before{content:'✦';position:absolute;top:10px;left:14px;font-family:'Press Start 2P',monospace;font-size:8px;color:rgba(200,168,74,.4);}
+.mana-card::after{content:'✦';position:absolute;top:10px;right:14px;font-family:'Press Start 2P',monospace;font-size:8px;color:rgba(200,168,74,.4);}
+.mana-card h2{font-family:'Press Start 2P',monospace;color:#c8a84a;font-size:clamp(10px,2vw,13px);margin-bottom:20px;text-align:center;letter-spacing:2px;text-shadow:2px 2px 0 #6b4a00;border-bottom:3px solid rgba(200,168,74,.28);padding-bottom:12px;}
+.mana-card p,.mana-card li{font-size:clamp(13px,1.8vw,15px);line-height:2.2em;color:#b8c8a0;}
+.mana-card ul,.mana-card ol{padding-left:22px;}
+.mana-card li{margin-bottom:10px;}
+.hero{text-align:center;padding:72px 20px 64px;position:relative;overflow:hidden;margin-bottom:34px;background:rgba(6,14,10,.62);border-top:4px solid #4a7a30;border-left:4px solid #4a7a30;border-bottom:4px solid #0e1c0c;border-right:4px solid #0e1c0c;box-shadow:6px 6px 0 #040a06;}
+.hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='8' height='8' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='0' y='0' width='4' height='4' fill='rgba(168,224,99,0.025)'/%3E%3Crect x='4' y='4' width='4' height='4' fill='rgba(168,224,99,0.025)'/%3E%3C/svg%3E");pointer-events:none;}
+.hero-eyebrow{font-family:'Press Start 2P',monospace;font-size:clamp(7px,1.2vw,9px);color:#c8a84a;letter-spacing:3px;margin-bottom:18px;opacity:.85;text-shadow:1px 1px 0 #4a3000;position:relative;}
+.hero-title{font-family:'Press Start 2P',monospace;font-size:clamp(20px,6vw,48px);color:#a8e063;text-shadow:4px 4px 0 #1a4a10,8px 8px 0 rgba(0,0,0,.5),0 0 30px rgba(168,224,99,.4);margin-bottom:12px;letter-spacing:3px;line-height:1.3;position:relative;}
+.hero-title span{color:#ffd700;text-shadow:4px 4px 0 #6b4a00,8px 8px 0 rgba(0,0,0,.4),0 0 20px rgba(255,215,0,.45);}
+.hero-divider{display:flex;align-items:center;gap:12px;justify-content:center;margin:20px 0;opacity:.5;}
+.hero-divider::before,.hero-divider::after{content:'';flex:1;max-width:100px;height:3px;background:repeating-linear-gradient(90deg,#c8a84a 0,#c8a84a 4px,transparent 4px,transparent 8px);}
+.hero-divider span{color:#c8a84a;font-family:'Press Start 2P',monospace;font-size:10px;}
+.hero-sub{font-size:clamp(13px,2vw,16px);color:#8aaa70;margin-bottom:36px;font-style:italic;line-height:2.1em;position:relative;}
+.hero-buttons{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;}
+.btn-mana{display:inline-block;padding:13px 22px;font-family:'Press Start 2P',monospace;font-size:clamp(8px,1.4vw,10px);letter-spacing:1px;text-decoration:none;background:rgba(30,60,20,.60);color:#a8e063;cursor:pointer;border-top:3px solid #5aae30;border-left:3px solid #5aae30;border-bottom:3px solid #1a3e10;border-right:3px solid #1a3e10;box-shadow:3px 3px 0 #040a06;transition:all .1s steps(2);white-space:nowrap;}
+.btn-mana:hover{transform:translate(2px,2px);box-shadow:1px 1px 0 #040a06;color:#c8f090;}
+.btn-mana.gold{background:rgba(60,40,10,.55);color:#ffd700;border-top-color:#c8a84a;border-left-color:#c8a84a;border-bottom-color:#5a3a00;border-right-color:#5a3a00;}
+.btn-mana.gold:hover{color:#ffe88a;}
+.btn-mana.blue{background:rgba(14,28,60,.55);color:#7eb8e8;border-top-color:#4a80c0;border-left-color:#4a80c0;border-bottom-color:#1a2e50;border-right-color:#1a2e50;}
+.btn-mana.blue:hover{color:#aad4f8;}
+.btn-mana.red{background:rgba(60,14,10,.55);color:#e87878;border-top-color:#c04040;border-left-color:#c04040;border-bottom-color:#501a1a;border-right-color:#501a1a;}
+.btn-mana.red:hover{color:#f8a0a0;}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:14px;margin-bottom:28px;}
+.feature-box{background:rgba(10,20,14,.82);border-top:3px solid #3a6228;border-left:3px solid #3a6228;border-bottom:3px solid #142010;border-right:3px solid #142010;box-shadow:3px 3px 0 #040a06;padding:22px 14px;text-align:center;transition:transform .1s steps(2);}
+.feature-box:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 #040a06;}
+.feature-icon{font-size:26px;margin-bottom:10px;display:block;}
+.feature-box h3{font-family:'Press Start 2P',monospace;font-size:clamp(7px,1.2vw,9px);color:#c8a84a;margin-bottom:10px;letter-spacing:1px;text-shadow:1px 1px 0 #4a3000;}
+.feature-box p{font-size:clamp(11px,1.5vw,13px);color:#7a9860;line-height:2em;font-style:italic;}
+.rule-item{display:flex;gap:14px;align-items:flex-start;background:rgba(8,16,10,.75);border-left:4px solid #3a6228;padding:16px;margin-bottom:10px;flex-wrap:wrap;box-shadow:2px 2px 0 #040a06;transition:border-left-color .15s steps(2);}
+.rule-item:hover{border-left-color:#c8a84a;}
+.rule-num{font-family:'Press Start 2P',monospace;color:#c8a84a;font-size:11px;min-width:28px;text-align:center;flex-shrink:0;text-shadow:1px 1px 0 #4a3000;padding-top:2px;}
+.rule-text{font-size:clamp(12px,1.8vw,14px);line-height:2.2em;color:#b0c098;flex:1;min-width:140px;}
+.rule-category{font-family:'Press Start 2P',monospace;font-size:7px;color:#a8e063;margin-bottom:5px;letter-spacing:2px;text-shadow:1px 1px 0 #1a4a10;}
+.support-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:16px;}
+.support-card{background:rgba(10,20,14,.84);border-top:3px solid #3a6228;border-left:3px solid #3a6228;border-bottom:3px solid #142010;border-right:3px solid #142010;box-shadow:3px 3px 0 #040a06;padding:22px 16px;text-align:center;transition:transform .1s steps(2);}
+.support-card:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 #040a06;}
+.support-card .s-icon{font-size:30px;margin-bottom:12px;display:block;}
+.support-card h3{font-family:'Press Start 2P',monospace;font-size:clamp(7px,1.2vw,9px);color:#c8a84a;margin-bottom:10px;letter-spacing:1px;text-shadow:1px 1px 0 #4a3000;}
+.support-card p{font-size:clamp(11px,1.5vw,13px);color:#7a9860;line-height:2.1em;margin-bottom:14px;font-style:italic;}
+.vote-site{display:flex;align-items:center;justify-content:space-between;background:rgba(8,16,10,.76);border-left:4px solid rgba(200,168,74,.5);padding:16px;margin-bottom:10px;flex-wrap:wrap;gap:10px;box-shadow:2px 2px 0 #040a06;transition:border-left-color .15s steps(2);}
+.vote-site:hover{border-left-color:#ffd700;}
+.vote-name{font-family:'Press Start 2P',monospace;font-size:clamp(9px,1.6vw,11px);color:#ffd700;text-shadow:1px 1px 0 #4a3000;}
+.vote-desc{font-size:clamp(11px,1.5vw,13px);color:#7a9860;margin-top:5px;font-style:italic;}
+.store-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:22px;}
+.store-card{background:rgba(10,20,14,.86);border-top:3px solid rgba(200,168,74,.5);border-left:3px solid rgba(200,168,74,.5);border-bottom:3px solid #1a1000;border-right:3px solid #1a1000;box-shadow:4px 4px 0 #040a06;padding:26px 18px;text-align:center;position:relative;transition:transform .1s steps(2);}
+.store-card:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 #040a06;}
+.store-card.featured{border-top-color:#c8a84a;border-left-color:#c8a84a;}
+.store-card .badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:#0a1510;border:3px solid #c8a84a;color:#ffd700;font-family:'Press Start 2P',monospace;font-size:7px;padding:4px 12px;white-space:nowrap;letter-spacing:1px;box-shadow:2px 2px 0 #040a06;text-shadow:1px 1px 0 #4a3000;}
+.store-card h3{font-family:'Press Start 2P',monospace;font-size:clamp(10px,1.8vw,12px);color:#ffd700;margin-bottom:12px;letter-spacing:1px;text-shadow:2px 2px 0 #4a3000;}
+.store-card .price{font-family:'Press Start 2P',monospace;font-size:clamp(18px,3.5vw,24px);color:#a8e063;margin-bottom:16px;text-shadow:2px 2px 0 #1a4a10;}
+.store-card .price span{font-size:clamp(8px,1.3vw,10px);color:#5a7840;}
+.store-card ul{list-style:none;text-align:left;margin-bottom:18px;}
+.store-card ul li{font-size:clamp(11px,1.5vw,13px);color:#a8b890;padding:6px 0;border-bottom:2px solid rgba(168,224,99,.08);font-style:italic;}
+.store-card ul li::before{content:'▶ ';color:#c8a84a;font-style:normal;font-size:9px;}
+.discord-hero{text-align:center;background:rgba(10,16,28,.86);border-top:4px solid #4a80c0;border-left:4px solid #4a80c0;border-bottom:4px solid #0e1828;border-right:4px solid #0e1828;box-shadow:6px 6px 0 #040a06;padding:60px 20px;margin-bottom:28px;}
+.discord-hero h2{font-family:'Press Start 2P',monospace;font-size:clamp(13px,3vw,22px);color:#7eb8e8;text-shadow:3px 3px 0 #1a2e50;margin-bottom:16px;letter-spacing:2px;}
+.discord-hero p{font-size:clamp(13px,1.8vw,15px);color:#7a9898;margin-bottom:24px;line-height:2.1em;font-style:italic;}
+footer{background:rgba(4,8,6,.97);border-top:4px solid #1a3218;text-align:center;padding:24px 16px;font-family:'Press Start 2P',monospace;font-size:clamp(7px,1.2vw,9px);color:#2e5028;margin-top:50px;letter-spacing:1px;line-height:2.6em;position:relative;z-index:1;}
+footer span{color:#a8e063;text-shadow:1px 1px 0 #1a4a10;}
+::-webkit-scrollbar{width:8px;}
+::-webkit-scrollbar-track{background:#040a06;}
+::-webkit-scrollbar-thumb{background:#2a4e1e;border:2px solid #a8e063;border-radius:0;}
+@media(max-width:768px){
+    .topbar{flex-direction:column;align-items:flex-start;gap:6px;padding:10px 14px;font-size:8px;}
+    .connect-info{flex-direction:column;align-items:flex-start;gap:4px;}
+    .donation-bar-wrap{flex-wrap:wrap;gap:8px;padding:8px 14px;}
+    .hamburger{display:flex;}
+    .nav-top-row{padding:8px 0 4px;}
+    .nav-links{display:none;flex-direction:column;background:rgba(6,12,8,.99);border-top:3px solid #2a4e1e;width:100%;padding:0;}
+    .nav-links.open{display:flex;}
+    .nav-links a{padding:14px 20px;border-bottom:2px solid rgba(168,224,99,.08) !important;font-size:10px;width:100%;text-align:left;}
+    .hero{padding:46px 14px 42px;}
+    .store-grid{grid-template-columns:1fr;}
+    .support-grid{grid-template-columns:1fr;}
+    .mana-tree{opacity:.15;}
+}
+@media(max-width:480px){
+    .main{padding:18px 10px;}
+    .hero{padding:34px 10px 30px;}
+    .features-grid{grid-template-columns:1fr 1fr;gap:10px;}
+    .rule-item{flex-direction:column;gap:6px;}
+    .mana-card{padding:18px 14px;}
+    .nav-brand{font-size:11px;}
+    .mana-tree{opacity:.10;width:90vw;}
+}
+
+/* ── WIKI LAYOUT ── */
+.wiki-layout{display:flex;gap:0;min-height:calc(100vh - 200px);position:relative;z-index:1;}
+
+/* Sidebar */
+.wiki-sidebar{
+    width:260px;flex-shrink:0;
+    background:rgba(6,14,10,.97);
+    border-right:3px solid #2a4e1e;
+    padding:24px 0;
+    position:sticky;top:0;
+    height:calc(100vh - 148px);
+    overflow-y:auto;
+    scrollbar-width:thin;
+    scrollbar-color:#2a4e1e #040a06;
+}
+.wiki-sidebar::-webkit-scrollbar{width:5px;}
+.wiki-sidebar::-webkit-scrollbar-thumb{background:#2a4e1e;border-radius:0;}
+.wiki-sidebar-title{
+    font-family:'Press Start 2P',monospace;
+    font-size:8px;color:#c8a84a;
+    letter-spacing:2px;padding:0 20px 16px;
+    border-bottom:2px solid rgba(200,168,74,.2);
+    margin-bottom:12px;
+    text-shadow:1px 1px 0 #4a3000;
+}
+.wiki-sidebar a{
+    display:flex;align-items:center;gap:10px;
+    padding:12px 20px;
+    font-family:'IM Fell English',Georgia,serif;
+    font-size:14px;
+    color:#7a9860;
+    text-decoration:none;
+    border-left:3px solid transparent;
+    transition:all .15s steps(2);
+    line-height:1.4;
+}
+.wiki-sidebar a:hover{color:#a8e063;background:rgba(168,224,99,.05);border-left-color:#3a6228;}
+.wiki-sidebar a.active{color:#a8e063;background:rgba(168,224,99,.08);border-left-color:#a8e063;font-style:italic;}
+.wiki-sidebar a .nav-icon{font-size:16px;flex-shrink:0;}
+
+/* Content area */
+.wiki-content{
+    flex:1;min-width:0;
+    padding:40px 48px;
+    background:rgba(8,16,12,.55);
+}
+
+/* Breadcrumb */
+.wiki-breadcrumb{
+    font-family:'Press Start 2P',monospace;
+    font-size:8px;color:#4a6840;
+    margin-bottom:24px;
+    display:flex;align-items:center;gap:8px;
+    flex-wrap:wrap;
+}
+.wiki-breadcrumb a{color:#5a7850;text-decoration:none;}
+.wiki-breadcrumb a:hover{color:#a8e063;}
+.wiki-breadcrumb .sep{color:#2a3e28;}
+
+/* Page header */
+.wiki-page-icon{font-size:36px;margin-bottom:12px;display:block;}
+.wiki-page-title{
+    font-family:'Press Start 2P',monospace;
+    font-size:clamp(14px,2.5vw,20px);
+    color:#a8e063;
+    text-shadow:3px 3px 0 #1a4a10,0 0 20px rgba(168,224,99,.3);
+    margin-bottom:10px;
+    letter-spacing:2px;
+    line-height:1.4;
+}
+.wiki-page-intro{
+    font-size:16px;
+    color:#9ab888;
+    font-style:italic;
+    line-height:1.9em;
+    margin-bottom:36px;
+    padding-bottom:24px;
+    border-bottom:2px solid rgba(168,224,99,.12);
+}
+
+/* Section headers */
+.wiki-section{margin-bottom:36px;}
+.wiki-section-title{
+    font-family:'Press Start 2P',monospace;
+    font-size:clamp(9px,1.5vw,11px);
+    color:#c8a84a;
+    letter-spacing:1px;
+    text-shadow:1px 1px 0 #4a3000;
+    margin-bottom:14px;
+    padding-bottom:8px;
+    border-bottom:2px solid rgba(200,168,74,.2);
+    display:flex;align-items:center;gap:8px;
+}
+.wiki-section-title::before{content:'▶';font-size:8px;color:#5a7840;}
+
+/* List items */
+.wiki-section ul{list-style:none;padding:0;}
+.wiki-section ul li{
+    font-size:15px;
+    color:#b8c8a0;
+    line-height:1.9em;
+    padding:10px 14px;
+    border-bottom:1px solid rgba(168,224,99,.06);
+    display:flex;align-items:flex-start;gap:10px;
+}
+.wiki-section ul li::before{content:'✦';color:#3a5828;font-size:10px;flex-shrink:0;margin-top:4px;}
+.wiki-section ul li:last-child{border-bottom:none;}
+.wiki-section ul li code{
+    font-family:'Press Start 2P',monospace;
+    font-size:10px;
+    background:rgba(168,224,99,.1);
+    border:1px solid rgba(168,224,99,.2);
+    padding:2px 7px;
+    color:#a8e063;
+    white-space:nowrap;
+    display:inline-block;
+}
+.wiki-section ul li strong{color:#e8dfc0;}
+.wiki-section ul li em{color:#8aaa70;}
+
+/* Divider */
+.wiki-divider{height:2px;background:repeating-linear-gradient(90deg,rgba(168,224,99,.12) 0,rgba(168,224,99,.12) 4px,transparent 4px,transparent 8px);margin:32px 0;}
+
+/* ── PREV / NEXT BUTTONS ── */
+.wiki-pagination{
+    display:flex;justify-content:space-between;align-items:stretch;
+    gap:16px;margin-top:48px;padding-top:32px;
+    border-top:3px solid rgba(168,224,99,.12);
+    flex-wrap:wrap;
+}
+.wiki-pag-btn{
+    display:flex;align-items:center;gap:14px;
+    padding:18px 22px;
+    background:rgba(10,20,14,.85);
+    border-top:3px solid #3a6228;border-left:3px solid #3a6228;
+    border-bottom:3px solid #142010;border-right:3px solid #142010;
+    box-shadow:3px 3px 0 #040a06;
+    text-decoration:none;
+    transition:all .1s steps(2);
+    flex:1;min-width:200px;max-width:48%;
+}
+.wiki-pag-btn:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 #040a06;border-top-color:#5a8240;border-left-color:#5a8240;}
+.wiki-pag-btn.prev{justify-content:flex-start;}
+.wiki-pag-btn.next{justify-content:flex-end;text-align:right;margin-left:auto;}
+.wiki-pag-btn.disabled{opacity:.3;pointer-events:none;}
+.pag-arrow{font-size:20px;color:#a8e063;flex-shrink:0;}
+.pag-label{font-family:'Press Start 2P',monospace;font-size:7px;color:#5a7840;letter-spacing:1px;display:block;margin-bottom:5px;text-transform:uppercase;}
+.pag-title{font-family:'IM Fell English',Georgia,serif;font-size:15px;color:#c8d4b0;font-style:italic;line-height:1.4;}
+
+/* Mobile sidebar toggle */
+.wiki-sidebar-toggle{
+    display:none;
+    width:100%;
+    font-family:'Press Start 2P',monospace;font-size:8px;
+    color:#a8e063;background:rgba(6,14,10,.97);
+    border:none;border-bottom:3px solid #2a4e1e;
+    padding:14px 20px;cursor:pointer;
+    text-align:left;gap:10px;align-items:center;
+}
+.wiki-sidebar-toggle::before{content:'📖 ';}
+
+@media(max-width:900px){
+    .wiki-layout{flex-direction:column;}
+    .wiki-sidebar{
+        width:100%;height:auto;position:static;
+        border-right:none;border-bottom:3px solid #2a4e1e;
+        display:none;
+    }
+    .wiki-sidebar.open{display:block;}
+    .wiki-sidebar-toggle{display:flex;}
+    .wiki-content{padding:24px 20px;}
+    .wiki-pag-btn{min-width:0;flex:1;}
+}
+@media(max-width:480px){
+    .wiki-content{padding:18px 12px;}
+    .wiki-pag-btn{max-width:100%;flex-basis:100%;}
+    .wiki-pagination{flex-direction:column;}
+    .wiki-pag-btn.next{margin-left:0;}
+}
+</style>
+</head>
+<body>
+<svg class="mana-tree" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" shape-rendering="crispEdges" aria-hidden="true">
+  <defs>
+    <radialGradient id="glowGold" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#ffe066" stop-opacity="0.6"/><stop offset="100%" stop-color="#c8860a" stop-opacity="0"/></radialGradient>
+    <radialGradient id="glowGreen" cx="50%" cy="40%" r="55%"><stop offset="0%" stop-color="#a8e063" stop-opacity="0.5"/><stop offset="100%" stop-color="#2d6a1f" stop-opacity="0"/></radialGradient>
+  </defs>
+  <ellipse cx="200" cy="572" rx="88" ry="20" fill="url(#glowGold)" opacity="0.7"/>
+  <rect x="188" y="540" width="24" height="16" fill="#5a3210" opacity="0.9"/>
+  <rect x="184" y="524" width="32" height="16" fill="#5a3210" opacity="0.88"/>
+  <rect x="182" y="508" width="36" height="16" fill="#4e2b0e" opacity="0.88"/>
+  <rect x="180" y="492" width="40" height="16" fill="#5a3210" opacity="0.86"/>
+  <rect x="178" y="476" width="44" height="16" fill="#4e2b0e" opacity="0.86"/>
+  <rect x="180" y="460" width="40" height="16" fill="#5a3210" opacity="0.85"/>
+  <rect x="182" y="444" width="36" height="16" fill="#4e2b0e" opacity="0.84"/>
+  <rect x="183" y="428" width="34" height="16" fill="#5a3210" opacity="0.84"/>
+  <rect x="184" y="412" width="32" height="16" fill="#4e2b0e" opacity="0.82"/>
+  <rect x="186" y="396" width="28" height="16" fill="#5a3210" opacity="0.82"/>
+  <rect x="188" y="380" width="24" height="16" fill="#4e2b0e" opacity="0.80"/>
+  <rect x="190" y="364" width="20" height="16" fill="#5a3210" opacity="0.80"/>
+  <rect x="191" y="348" width="18" height="16" fill="#4e2b0e" opacity="0.78"/>
+  <rect x="194" y="360" width="4" height="180" fill="#8b5e2a" opacity="0.3"/>
+  <rect x="152" y="556" width="32" height="8" fill="#4a2a0a" opacity="0.65"/>
+  <rect x="136" y="564" width="24" height="8" fill="#4a2a0a" opacity="0.5"/>
+  <rect x="216" y="556" width="32" height="8" fill="#4a2a0a" opacity="0.65"/>
+  <rect x="240" y="564" width="24" height="8" fill="#4a2a0a" opacity="0.5"/>
+  <rect x="192" y="572" width="16" height="8" fill="#4a2a0a" opacity="0.55"/>
+  <rect x="152" y="356" width="32" height="8" fill="#5a3210" opacity="0.78"/>
+  <rect x="128" y="332" width="32" height="8" fill="#5a3210" opacity="0.72"/>
+  <rect x="104" y="308" width="32" height="8" fill="#5a3210" opacity="0.66"/>
+  <rect x="152" y="332" width="8" height="24" fill="#5a3210" opacity="0.68"/>
+  <rect x="128" y="308" width="8" height="24" fill="#5a3210" opacity="0.62"/>
+  <rect x="216" y="356" width="32" height="8" fill="#5a3210" opacity="0.78"/>
+  <rect x="240" y="332" width="32" height="8" fill="#5a3210" opacity="0.72"/>
+  <rect x="264" y="308" width="32" height="8" fill="#5a3210" opacity="0.66"/>
+  <rect x="240" y="332" width="8" height="24" fill="#5a3210" opacity="0.68"/>
+  <rect x="264" y="308" width="8" height="24" fill="#5a3210" opacity="0.62"/>
+  <rect x="192" y="332" width="8" height="32" fill="#5a3210" opacity="0.75"/>
+  <rect x="184" y="300" width="8" height="32" fill="#5a3210" opacity="0.7"/>
+  <rect x="208" y="300" width="8" height="32" fill="#5a3210" opacity="0.7"/>
+  <ellipse cx="200" cy="210" rx="155" ry="130" fill="url(#glowGreen)" opacity="0.9"/>
+  <ellipse cx="200" cy="110" rx="60" ry="50" fill="#ffe066" opacity="0.12"/>
+  <rect x="80"  y="280" width="240" height="48" fill="#2d5a18" opacity="0.30"/>
+  <rect x="64"  y="248" width="272" height="48" fill="#336620" opacity="0.28"/>
+  <rect x="80"  y="216" width="240" height="48" fill="#3a7322" opacity="0.26"/>
+  <rect x="96"  y="184" width="208" height="48" fill="#428226" opacity="0.24"/>
+  <rect x="112" y="152" width="176" height="48" fill="#4a9028" opacity="0.22"/>
+  <rect x="128" y="120" width="144" height="48" fill="#52a030" opacity="0.20"/>
+  <rect x="144" y="92"  width="112" height="40" fill="#5aae38" opacity="0.18"/>
+  <rect x="160" y="68"  width="80"  height="36" fill="#6abf40" opacity="0.16"/>
+  <rect x="172" y="48"  width="56"  height="28" fill="#78ce48" opacity="0.14"/>
+  <rect x="96"  y="268" width="208" height="40" fill="#4a9030" opacity="0.20"/>
+  <rect x="80"  y="236" width="240" height="40" fill="#52a038" opacity="0.18"/>
+  <rect x="128" y="256" width="144" height="32" fill="#7ed450" opacity="0.12"/>
+  <rect x="156" y="148" width="8" height="8" fill="#ffe066" opacity="0.65"/>
+  <rect x="236" y="144" width="8" height="8" fill="#ffe066" opacity="0.60"/>
+  <rect x="196" y="108" width="8" height="8" fill="#ffd700" opacity="0.65"/>
+  <rect x="176" y="92"  width="8" height="8" fill="#ffd700" opacity="0.60"/>
+  <rect x="188" y="60"  width="8" height="8" fill="#ffd700" opacity="0.55"/>
+  <rect x="166" y="128" width="4" height="4" fill="#ffffff" opacity="0.75"/>
+  <rect x="226" y="122" width="4" height="4" fill="#ffffff" opacity="0.70"/>
+  <rect x="198" y="82"  width="6" height="6" fill="#fffacd" opacity="0.80"/>
+</svg>
+<div class="topbar">
+    <div class="server-status"><span class="status-dot"></span><span>ONLINE &nbsp;|&nbsp; Players: <strong id="player-count" style="color:#a8e063;">...</strong></span></div>
+    <div class="connect-info"><span style="color:#c8a84a;">CONNECT:</span><span>Java: <strong>play.manacraft.net</strong></span><span>Bedrock: <strong>bedrock.manacraft.net:19132</strong></span></div>
+</div>
+<div class="donation-bar-wrap">
+    <span class="donation-label">MONTHLY MANA GOAL</span>
+    <div class="bar-outer"><div class="bar-inner" id="donate-bar"></div><div class="bar-text" id="donate-text">0%</div></div>
+    <span class="donation-amount" id="donate-amount">$0 / $150</span>
+    <a href="store.html" class="btn-mana gold" style="font-size:7px;padding:6px 10px;">DONATE</a>
+</div>
+<nav>
+    <div class="nav-top-row">
+        <a href="index.html" class="nav-brand">Mana<span>CRAFT</span></a>
+        <button class="hamburger" id="hamburger-btn" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+    </div>
+    <div class="nav-links" id="nav-links"><a href="index.html" class="home">Home</a>
+<a href="rules.html" class="rules">Rules</a>
+<a href="support.html" class="support">Support</a>
+<a href="vote.html" class="vote">Vote</a>
+<a href="store.html" class="store store">Store</a>
+<a href="discord.html" class="discord discord">Discord</a>
+<a href="wiki.html" class="wiki active">Wiki</a>
+</div>
+</nav>
+
+
+<button class="wiki-sidebar-toggle" id="wiki-sidebar-toggle">ANCIENT SCROLLS — MENU</button>
+<div class="wiki-layout">
+    <aside class="wiki-sidebar" id="wiki-sidebar">
+        <div class="wiki-sidebar-title">✦ ANCIENT SCROLLS</div>
+        <a href="getting-started.html" class=""><span class="nav-icon">🚀</span>The First Journey</a>
+<a href="combat.html" class=""><span class="nav-icon">⚔️</span>Combat Scrolls</a>
+<a href="economy.html" class=""><span class="nav-icon">💰</span>Coin & Trade</a>
+<a href="survival.html" class=" active"><span class="nav-icon">🏰</span>Realm & Survival</a>
+<a href="ranks.html" class=""><span class="nav-icon">👑</span>Ranks & Blessings</a>
+<a href="plugins.html" class=""><span class="nav-icon">🔧</span>Arcane Plugins</a>
+
+    </aside>
+    <div class="wiki-content">
+
+<div class="wiki-breadcrumb">
+    <a href="wiki.html">Wiki</a>
+    <span class="sep">▶</span>
+    <span style="color:#7a9860;">Realm & Survival</span>
+</div>
+<span class="wiki-page-icon">🏰</span>
+<h1 class="wiki-page-title">Realm & Survival</h1>
+<p class="wiki-page-intro">ManaCRAFT's survival world is vast and full of wonder. Learn how to establish your stronghold and thrive in the realm.</p>
+
+<div class="wiki-section">
+    <h3 class="wiki-section-title">Land Claiming (GriefPrevention)</h3>
+    <ul><li>Use a <strong>golden shovel</strong> to claim land by clicking two corners.</li><li>Claims protect your builds from all other players.</li><li>Expand claims by shift-clicking with the golden shovel.</li><li>Check claim info: right-click with a <strong>stick</strong>.</li><li>Trust a friend: <code>/trust &lt;player&gt;</code> inside your claim.</li></ul>
+</div>
+<div class="wiki-divider"></div>
+<div class="wiki-section">
+    <h3 class="wiki-section-title">Founding Your Stronghold</h3>
+    <ul><li>Use <code>/rtp</code> to find untouched wilderness far from spawn.</li><li>Build at least <strong>500 blocks from spawn</strong> for the best resources.</li><li>Claim your land immediately after placing your first chest.</li><li>Consider building underground or in caves to stay hidden from raiders.</li></ul>
+</div>
+<div class="wiki-divider"></div>
+<div class="wiki-section">
+    <h3 class="wiki-section-title">Chest Market Stalls</h3>
+    <ul><li>You can sell items directly from your base using chest shops.</li><li>Place a chest, then place a sign above it with shop details.</li><li>Players can buy from your shop even when you are offline.</li><li>Set competitive prices — check <code>/ah</code> to see market rates.</li></ul>
+</div>
+<div class="wiki-divider"></div>
+<div class="wiki-section">
+    <h3 class="wiki-section-title">Sacred Warps</h3>
+    <ul><li><code>/warp spawn</code> — Main spawn hub.</li><li><code>/warp market</code> — Player market district.</li><li><code>/warp pvp</code> — PvP arena complex.</li><li><code>/warp mines</code> — Communal resource mines (reset daily).</li><li><code>/warp nether</code> — Nether hub portal.</li><li>Request a public warp for your build: open a ticket in Discord.</li></ul>
+</div>
+<div class="wiki-divider"></div>
+<div class="wiki-pagination"><a href="economy.html" class="wiki-pag-btn prev"><span class="pag-arrow">◀</span><div><span class="pag-label">Previous</span><span class="pag-title">Coin & Trade</span></div></a><a href="ranks.html" class="wiki-pag-btn next"><div><span class="pag-label">Next</span><span class="pag-title">Ranks & Blessings</span></div><span class="pag-arrow">▶</span></a></div>
+    </div><!-- wiki-content -->
+</div><!-- wiki-layout -->
+<footer><p>* &nbsp; <span>ManaCRAFT</span> &nbsp; * &nbsp; A world reborn from the roots of the Mana Tree &nbsp; *</p><p style="margin-top:4px;font-size:6px;color:#1e3a18;">Not affiliated with Square Enix or Mojang Studios.</p></footer>
+<script>
+function updatePlayerCount(){const c=Math.floor(Math.random()*40)+5;const e=document.getElementById('player-count');if(e)e.textContent=c+'/100';}
+function animateDonationBar(){const g=150,c=87,p=Math.round(c/g*100);const b=document.getElementById('donate-bar'),t=document.getElementById('donate-text'),a=document.getElementById('donate-amount');if(b)setTimeout(()=>{b.style.width=p+'%';},400);if(t)t.textContent=p+'%';if(a)a.textContent='$'+c+' / $'+g;}
+function initHamburger(){const b=document.getElementById('hamburger-btn'),l=document.getElementById('nav-links');if(!b||!l)return;b.addEventListener('click',()=>{b.classList.toggle('open');l.classList.toggle('open');});l.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{b.classList.remove('open');l.classList.remove('open');}));}
+function initWikiSidebar(){const t=document.getElementById('wiki-sidebar-toggle'),s=document.getElementById('wiki-sidebar');if(!t||!s)return;t.addEventListener('click',()=>s.classList.toggle('open'));}
+document.addEventListener('DOMContentLoaded',()=>{updatePlayerCount();animateDonationBar();initHamburger();initWikiSidebar();setInterval(updatePlayerCount,30000);});
+</script>
+</body>
+</html>
